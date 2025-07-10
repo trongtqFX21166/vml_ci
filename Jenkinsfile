@@ -120,6 +120,20 @@ pipeline {
                                 echo "GitOps repository updated. ArgoCD will sync automatically."
                             """
                         }
+                        dir("${WORKSPACE}/vml_ci") {
+                            echo "Starting Kubernetes deployment..."
+                            
+                            // Example ArgoCD deployment steps
+                            sh """
+                                echo "Update build version"
+                                
+                                git add .
+                                git commit -m "Deploy ${params.REPO} build ${BUILD_NUMBER} from branch ${params.RELEASE_BRANCH}" || echo "No changes to commit"
+                                git push origin main
+                                
+                                echo "update build version success"
+                            """
+                        }
                     } catch (Exception e) {
                         error "Deployment failed: ${e.getMessage()}"
                     }
