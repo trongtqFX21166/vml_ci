@@ -23,13 +23,22 @@ def run_command(cmd: List[str], cwd: str = None) -> Tuple[bool, str]:
         return True, result.stdout
     except subprocess.CalledProcessError as e:
         return False, e.stderr
+    
+
+def remove_bom_and_read_json(file_path: str) -> dict:
+    """Read JSON file and handle UTF-8 BOM if present."""
+    try:
+        # First try with utf-8-sig encoding
+        with open(file_path, 'r', encoding='utf-8-sig') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Failed to read JSON file {file_path}: {e}")
+        raise  
 
 def load_config(config_path: str) -> List[Dict[str, Any]]:
     """Load configuration from JSON file."""
     try:
-        with open(config_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-            return json.loads(content)
+        return remove_bom_and_read_json(config_path)
     except json.JSONDecodeError as e:
         print(f"JSON Error: {e}")
         print(f"JSON Error position: Line {e.lineno}, Column {e.colno}, Position {e.pos}")
@@ -50,9 +59,8 @@ def save_config(config_path: str, config: List[Dict[str, Any]]) -> None:
 def get_app_version(app_setting_path: str) -> Optional[str]:
     """Get application version from appsettings.json."""
     try:
-        with open(app_setting_path, 'r', encoding='utf-8') as f:
-            app_config = json.load(f)
-            return app_config.get("Deployment", {}).get("Version")
+        app_config = remove_bom_and_read_json(app_setting_path)
+        return app_config.get("Deployment", {}).get("Version")
     except Exception as e:
         print(f"Failed to read app config: {e}")
         return None
