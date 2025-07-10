@@ -4,10 +4,10 @@ pipeline {
         label 'linux'
     }
     environment {
-        ENV="Staging"
+        ENV="Dev"
         BITBUCKET_PROJECT="Hub"
         JIRA_PROJECT="VC"
-        DEPLOY_REPO="Deployment"
+        DEPLOY_REPO="vml_ci"
     }
 
     parameters {
@@ -16,7 +16,7 @@ pipeline {
         string(name: 'REPO', defaultValue: 'pois', description: 'Repository to deploy (e.g., activity, pois)')
         string(name: 'PROJECTS', defaultValue: '', description: 'Comma-separated list of projects to deploy (leave empty to deploy all)')
         string(name: 'PROJECT_NAME', defaultValue: '', description: 'Project name for deployment (defaults to REPO if empty)')
-        choice(name: 'BUILD_MODE', choices: ['CICD', 'CI'], defaultValue: 'CICD', description: 'Build mode: CI for build only, CICD for build and deploy')
+        choice(name: 'BUILD_MODE', choices: ['CICD', 'CI'], description: 'Build mode: CI for build only, CICD for build and deploy')
     }
     
     stages {
@@ -40,7 +40,7 @@ pipeline {
         stage("Clone repos"){
             steps{
                 // Clone Deployment repo
-                sh "git clone ssh://git@bitbucket-ssh.vietmap.vn:7999/${BITBUCKET_PROJECT}/${DEPLOY_REPO}.git"
+                sh "git clone https://github.com/trongtqFX21166/vml_ci.git"
                 
                 // Clone repository to deploy
                 sh "git clone ssh://git@bitbucket-ssh.vietmap.vn:7999/${BITBUCKET_PROJECT}/${params.REPO}.git"
@@ -52,14 +52,14 @@ pipeline {
         stage("Checkout branch"){
             steps{
                 // Checkout the same branch in both repos
-                dir("${DEPLOY_REPO}"){
-                    sh "git checkout ${params.RELEASE_BRANCH}"
+                dir("vml_ci"){
+                    sh "git checkout main"
                 }
                 dir("${params.REPO}"){
                     sh "git checkout ${params.RELEASE_BRANCH}"
                 }  
-                dir("${params.REPO}"){
-                    sh "git checkout ${params.RELEASE_BRANCH}"
+                dir("vml_argocd"){
+                    sh "git checkout main"
                 }              
             }
         }   
