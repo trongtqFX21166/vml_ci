@@ -40,13 +40,15 @@ pipeline {
         stage("Clone repos"){
             steps{
                 // Clone Deployment repo
-                sh "git clone https://github.com/trongtqFX21166/vml_ci.git"
+                sh "git remote seturl git@github.com:trongtqFX21166/vml_ci.git"
+                sh "git pull"
                 
                 // Clone repository to deploy
                 sh "git clone ssh://git@bitbucket-ssh.vietmap.vn:7999/${BITBUCKET_PROJECT}/${params.REPO}.git"
 
                 // Clone cd repo
-                sh "git clone https://github.com/trongtqFX21166/vml_argocd.git"
+                sh "git remote seturl git@github.com:trongtqFX21166/vml_argocd.git"
+                sh "git pull"
             }
         }
         stage("Checkout branch"){
