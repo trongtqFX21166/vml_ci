@@ -1,0 +1,10 @@
+[
+  {
+    "app": "VietmapCloud.VietmapLive.Api",
+    "path": "../vml/be_auth_sso_service/VietmapCloud.VietmapLive.Api",
+    "yaml": "vml-api-deployment.yaml",
+    "index": 0,
+    "version": "1.0.1",
+    "readytodeploy": 1
+  }
+]
