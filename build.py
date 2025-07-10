@@ -249,18 +249,27 @@ ENTRYPOINT ["dotnet", "{project_name}.dll"]"""
         print(f"Direct build failed: {e}")
         return False
 
-def update_yaml_files(env: str, yaml_files: List[str], image_tag: str, version: str) -> bool:
+def update_yaml_files(env: str, yaml_files: List[str], image_tag: str, version: str, yamlpath: str = None) -> bool:
     """Update the image version in yaml files using yq."""
     for yaml_file in yaml_files:
         yaml_file = yaml_file.strip()
         
-        # Try multiple possible locations for YAML files
-        possible_paths = [
-            Path(f"../vml_argocd/vml/{env.lower()}/base/{yaml_file}"),
-            Path(f"modules/vml/{env.lower()}/base/{yaml_file}"),
-            Path(f"vml_argocd/vml/{env.lower()}/base/{yaml_file}"),
-            Path(f"../vml/{env.lower()}/base/{yaml_file}")
-        ]
+        # Use yamlpath if provided, otherwise use default paths
+        if yamlpath:
+            # Try multiple possible locations using yamlpath
+            possible_paths = [
+                Path(f"../vml_argocd/vml/{env.lower()}/base/{yamlpath}/{yaml_file}"),
+                Path(f"vml_argocd/vml/{env.lower()}/base/{yamlpath}/{yaml_file}"),
+                Path(f"../vml/{env.lower()}/base/{yamlpath}/{yaml_file}"),
+            ]
+        else:
+            # Try multiple possible locations for YAML files (original behavior)
+            possible_paths = [
+                Path(f"../vml_argocd/vml/{env.lower()}/base/{yaml_file}"),
+                Path(f"modules/vml/{env.lower()}/base/{yaml_file}"),
+                Path(f"vml_argocd/vml/{env.lower()}/base/{yaml_file}"),
+                Path(f"../vml/{env.lower()}/base/{yaml_file}")
+            ]
         
         yaml_path = None
         for path in possible_paths:
@@ -421,6 +430,7 @@ def main():
         path = item['path']
         old_version = item.get('version', '1.0.0')
         yaml_files = item['yaml'].split('|') if '|' in item['yaml'] else [item['yaml']]
+        yamlpath = item.get('yamlpath')  # Get yamlpath if provided
         image_tag = item['app']
         
         # Find the original index in the full config for updating later
@@ -505,7 +515,7 @@ def main():
             continue
         
         # Update YAML files with the new image tag (only in CICD mode)
-        if not update_yaml_files(env, yaml_files, image_tag, version):
+        if not update_yaml_files(env, yaml_files, image_tag, version, yamlpath):
             print(f"Failed to update YAML files for {image_tag}")
             build_results.append(False)
             continue
