@@ -296,68 +296,62 @@ def update_yaml_files(env: str, yaml_files: List[str], image_tag: str, version: 
     return True
 
 def commit_changes(env: str, config: List[Dict[str, Any]]) -> bool:
-    """Commit and push changes to Git."""
+    """Commit and push changes to Git repositories separately."""
     commit_msg = " ".join([f"{item['app']}::{item.get('version', '1.0.0')}" for item in config])
     
-    # Find the actual paths for git operations
-    config_paths = []
-    yaml_paths = []
+    # Commit changes to the main deployment repository
+    print("Committing changes to deployment repository...")
+    config_file = f"modules/vml/{env.lower()}/build.config.json"
     
-    # Look for config file in possible locations
-    possible_config_paths = [
-        f"modules/vml/{env.lower()}/build.config.json",
-        f"vml_ci/modules/vml/{env.lower()}/build.config.json"
+    if os.path.exists(config_file):
+        deploy_commands = [
+            ['git', 'add', config_file],
+            ['git', 'commit', '-m', f"Update VML {env} config: {commit_msg}"],
+            ['git', 'push']
+        ]
+        
+        for cmd in deploy_commands:
+            success, output = run_command(cmd)
+            if not success:
+                print(f"Deployment repo git operation failed: {output}")
+                print(f"Warning: Git command failed: {' '.join(cmd)}")
+    else:
+        print(f"Warning: Config file {config_file} not found")
+    
+    # Commit changes to the ArgoCD repository
+    print("Committing changes to ArgoCD repository...")
+    argocd_paths = [
+        f"../vml_argocd",
+        f"vml_argocd"
     ]
     
-    for config_path in possible_config_paths:
-        if os.path.exists(config_path):
-            config_paths.append(config_path)
+    argocd_path = None
+    for path in argocd_paths:
+        if os.path.exists(path):
+            argocd_path = path
+            break
     
-    # Look for YAML files in possible locations
-    possible_yaml_dirs = [
-        f"../vml_argocd/vml/{env.lower()}/base/",
-        f"vml_argocd/vml/{env.lower()}/base/",
-        f"../vml/{env.lower()}/base/"
-    ]
-    
-    for yaml_dir in possible_yaml_dirs:
-        if os.path.exists(yaml_dir):
-            yaml_paths.append(f"{yaml_dir}*.yaml")
-    
-    if not config_paths:
-        print("Warning: No config file found to commit")
-    
-    if not yaml_paths:
-        print("Warning: No YAML directory found to commit")
-    
-    # Build git commands
-    git_commands = []
-    
-    # Add config files
-    for config_path in config_paths:
-        git_commands.append(['git', 'add', config_path])
-    
-    # Add YAML files
-    for yaml_path in yaml_paths:
-        git_commands.append(['git', 'add', yaml_path])
-    
-    # Commit and push
-    git_commands.extend([
-        ['git', 'commit', '-m', f"Update VML {env} deployments: {commit_msg}"],
-        ['git', 'push']
-    ])
-
-    print(f"Git operations to perform:")
-    for cmd in git_commands:
-        print(f"  {' '.join(cmd)}")
-
-    for cmd in git_commands:
-        success, output = run_command(cmd)
-        if not success:
-            print(f"Git operation failed: {output}")
-            # Don't fail the entire process for git issues, just warn
-            print(f"Warning: Git command failed: {' '.join(cmd)}")
-            continue
+    if argocd_path:
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(argocd_path)
+            
+            argocd_commands = [
+                ['git', 'add', f"vml/{env.lower()}/base/*.yaml"],
+                ['git', 'commit', '-m', f"Update VML {env} YAML deployments: {commit_msg}"],
+                ['git', 'push']
+            ]
+            
+            for cmd in argocd_commands:
+                success, output = run_command(cmd)
+                if not success:
+                    print(f"ArgoCD repo git operation failed: {output}")
+                    print(f"Warning: Git command failed: {' '.join(cmd)}")
+                    
+        finally:
+            os.chdir(original_cwd)
+    else:
+        print("Warning: ArgoCD repository not found")
     
     return True
 
