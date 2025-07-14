@@ -23,7 +23,7 @@
     "yamlpath": "syncwaypoint-service",
     "yaml": "syncwaypoint-deployment.yaml",
     "index": 0,
-    "version": "2.62.2",
+    "version": "dev.2.62.3",
     "readytodeploy": 1
   }
 ]
