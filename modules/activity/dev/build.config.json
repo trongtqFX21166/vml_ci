@@ -1,0 +1,47 @@
+[
+  {
+    "app": "activity.api",
+    "path": "../activity/Apis/VietmapLive.Activity.Mobile.Api",
+    "yamlpath": "activity-api",
+    "yaml": "activity-api-deployment.yaml",
+    "index": 0,
+    "version": "dev.1.0.11",
+    "readytodeploy": 1
+  },
+  {
+    "app": "admin.activity.api",
+    "path": "../activity/Apis/VietmapLive.Activity.Api",
+    "yamlpath": "admin-activity-api",
+    "yaml": "admin-activity-api-deployment.yaml",
+    "index": 1,
+    "version": "dev.1.0.25",
+    "readytodeploy": 1
+  },
+  {
+    "app": "vietmaplive.activity.realtimeservice",
+    "path": "../activity/Services/VietmapLive.Activity.RealtimeService",
+    "yamlpath": "activity-realtime",
+    "yaml": "activity-realtime-deployment.yaml",
+    "index": 2,
+    "version": "dev.1.0.4",
+    "readytodeploy": 1
+  },
+  {
+    "app": "vietmaplive.activity.schedulerservice",
+    "path": "../activity/Services/VietmapLive.Activity.SchedulerService",
+    "yamlpath": "activity-scheduler",
+    "yaml": "activity-scheduler-deployment.yaml",
+    "index": 3,
+    "version": "dev.1.0.6",
+    "readytodeploy": 1
+  },
+  {
+    "app": "vietmaplive.activity.handlevmlevent.service",
+    "path": "../activity/Services/VietmapLive.Activity.HandleVmlEvent.Service",
+    "yamlpath": "activity-scheduler",
+    "yaml": "activity-handle-vmlevent-deployment.yaml",
+    "index": 4,
+    "version": "dev.1.0.4",
+    "readytodeploy": 1
+  }
+]
