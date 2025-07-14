@@ -7,5 +7,23 @@
     "index": 0,
     "version": "dev.14.8.201",
     "readytodeploy": 1
+  },
+  {
+    "app": "vietmapcloud.location.api",
+    "path": "../vml/be_location_service/LocationApi/VietmapCloud.Location.Api",
+    "yamlpath": "tracking-api",
+    "yaml": "tracking-api-deployment.yaml",
+    "index": 0,
+    "version": "dev.5.35.188",
+    "readytodeploy": 1
+  },
+  {
+    "app": "vietmapcloud.syncwaypoints",
+    "path": "../vml/be_location_service/LocationApi/VietmapCloud.SyncWaypoints/VietmapCloud.SyncWaypoints",
+    "yamlpath": "syncwaypoint-service",
+    "yaml": "syncwaypoint-deployment.yaml",
+    "index": 0,
+    "version": "2.62.2",
+    "readytodeploy": 1
   }
 ]
