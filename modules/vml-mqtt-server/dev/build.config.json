@@ -1,0 +1,62 @@
+[
+  {
+    "hub":"vmapi/hubcentral",
+    "app": "vmlmqtt.auth.api",
+    "path": "../vml-mqtt-server/VmlMQTT.Auth.Api",
+    "yamlpath": "vml-mqtt-auth-api",
+    "yaml": "vml-mqtt-auth-api-deployment.yaml",
+    "index": 0,
+    "version": "dev.1.0.100",
+    "readytodeploy": 1
+  },
+  {
+    "hub":"vmapi/hubcentral",
+    "app": "vmlmqtt.brokersmonitor.api",
+    "path": "../vml-mqtt-server/VmlMQTT.BrokersMonitor.Api",
+    "yamlpath": "vml-mqtt-brokers-monitor-api",
+    "yaml": "vml-mqtt-brokers-monitor-api-deployment.yaml",
+    "index": 1,
+    "version": "dev.1.0.100",
+    "readytodeploy": 1
+  },
+  {
+    "hub":"vmapi/hubcentral",
+    "app": "vmlmqtt.webhook.api",
+    "path": "../vml-mqtt-server/VmlMQTT.Webhook.Api",
+    "yamlpath": "vml-mqtt-webhook-api",
+    "yaml": "vml-mqtt-webhook-api-deployment.yaml",
+    "index": 2,
+    "version": "dev.1.0.100",
+    "readytodeploy": 1
+  },
+  {
+    "hub":"vmapi/hubcentral",
+    "app": "vmlmqtt.brokersmonitor.service",
+    "path": "../vml-mqtt-server/VmlMQTT.BrokersMonitor.Service",
+    "yamlpath": "vml-mqtt-brokers-monitor",
+    "yaml": "vml-mqtt-brokers-monitor-deployment.yaml",
+    "index": 3,
+    "version": "dev.1.0.100",
+    "readytodeploy": 1
+  },
+  {
+    "hub":"vmapi/hubcentral",
+    "app": "vmlmqtt.consumernotifymessage.service",
+    "path": "../vml-mqtt-server/Services/VmlMQTT.ConsumerNotifyMessage.Service",
+    "yamlpath": "vmlmqtt-consumernotifymessage",
+    "yaml": "vmlmqtt-consumernotifymessage-deployment.yaml",
+    "index": 4,
+    "version": "dev.1.0.100",
+    "readytodeploy": 1
+  },
+  {
+    "hub":"vmapi/hubcentral",
+    "app": "vmlmqtt.handlevmlevent.service",
+    "path": "../vml-mqtt-server/Services/VmlMQTT.HandleVmlEvent.Service",
+    "yamlpath": "vml-mqtt-handle-vml-event",
+    "yaml": "vml-mqtt-handle-vml-event-deployment.yaml",
+    "index": 5,
+    "version": "dev.1.0.100",
+    "readytodeploy": 1
+  }
+]

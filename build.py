@@ -249,7 +249,7 @@ ENTRYPOINT ["dotnet", "{project_name}.dll"]"""
         print(f"Direct build failed: {e}")
         return False
 
-def update_yaml_files(env: str, yaml_files: List[str], image_tag: str, version: str, yamlpath: str = None) -> bool:
+def update_yaml_files(repo: str,env: str, yaml_files: List[str], image_tag: str, version: str, yamlpath: str = None) -> bool:
     """Update the image version in yaml files using yq."""
     for yaml_file in yaml_files:
         yaml_file = yaml_file.strip()
@@ -258,17 +258,17 @@ def update_yaml_files(env: str, yaml_files: List[str], image_tag: str, version: 
         if yamlpath:
             # Try multiple possible locations using yamlpath
             possible_paths = [
-                Path(f"../vml_argocd/vml/{env.lower()}/base/{yamlpath}/{yaml_file}"),
-                Path(f"vml_argocd/vml/{env.lower()}/base/{yamlpath}/{yaml_file}"),
+                Path(f"../vml_argocd/{repo}/{env.lower()}/base/{yamlpath}/{yaml_file}"),
+                Path(f"vml_argocd/{repo}/{env.lower()}/base/{yamlpath}/{yaml_file}"),
                 Path(f"../vml/{env.lower()}/base/{yamlpath}/{yaml_file}"),
             ]
         else:
             # Try multiple possible locations for YAML files (original behavior)
             possible_paths = [
-                Path(f"../vml_argocd/vml/{env.lower()}/base/{yaml_file}"),
-                Path(f"modules/vml/{env.lower()}/base/{yaml_file}"),
-                Path(f"vml_argocd/vml/{env.lower()}/base/{yaml_file}"),
-                Path(f"../vml/{env.lower()}/base/{yaml_file}")
+                Path(f"../vml_argocd/{repo}/{env.lower()}/base/{yaml_file}"),
+                Path(f"modules/{repo}/{env.lower()}/base/{yaml_file}"),
+                Path(f"vml_argocd/{repo}/{env.lower()}/base/{yaml_file}"),
+                Path(f"../{repo}/{env.lower()}/base/{yaml_file}")
             ]
         
         yaml_path = None
@@ -304,13 +304,13 @@ def update_yaml_files(env: str, yaml_files: List[str], image_tag: str, version: 
             
     return True
 
-def commit_changes(env: str, config: List[Dict[str, Any]]) -> bool:
+def commit_changes(repo: str, env: str, config: List[Dict[str, Any]]) -> bool:
     """Commit and push changes to Git repositories separately."""
     commit_msg = " ".join([f"{item['app']}::{item.get('version', '1.0.0')}" for item in config])
     
     # Commit changes to the main deployment repository
     print("Committing changes to deployment repository...")
-    config_file = f"modules/vml/{env.lower()}/build.config.json"
+    config_file = f"modules/{repo}/{env.lower()}/build.config.json"
     
     if os.path.exists(config_file):
         deploy_commands = [
@@ -346,7 +346,7 @@ def commit_changes(env: str, config: List[Dict[str, Any]]) -> bool:
             os.chdir(argocd_path)
             
             argocd_commands = [
-                ['git', 'add', f"vml/{env.lower()}/base/*.yaml"],
+                ['git', 'add', f"{repo}/{env.lower()}/base/*.yaml"],
                 ['git', 'commit', '-m', f"Update VML {env} YAML deployments: {commit_msg}"],
                 ['git', 'push']
             ]
@@ -432,6 +432,7 @@ def main():
         yaml_files = item['yaml'].split('|') if '|' in item['yaml'] else [item['yaml']]
         yamlpath = item.get('yamlpath')  # Get yamlpath if provided
         image_tag = item['app']
+        REGISTRY_URL = item['hub']
         
         # Find the original index in the full config for updating later
         original_index = None
@@ -450,30 +451,11 @@ def main():
             print(f"Current working directory: {original_path}")
             print(f"Relative path from config: {item['path']}")
             print(f"Computed absolute path: {path}")
-            
-            # Try to find the correct path
-            possible_paths = [
-                os.path.join(original_path, "vml", "be_auth_sso_service", "VietmapCloud.VietmapLive.Api"),
-                os.path.join(original_path, "..", "vml", "be_auth_sso_service", "VietmapCloud.VietmapLive.Api"),
-                os.path.join(original_path, "modules", "vml", "be_auth_sso_service", "VietmapCloud.VietmapLive.Api")
-            ]
-            
-            print("Checking possible paths:")
-            for possible_path in possible_paths:
-                normalized_path = os.path.normpath(possible_path)
-                exists = os.path.isdir(normalized_path)
-                print(f"  {normalized_path}: {'EXISTS' if exists else 'NOT FOUND'}")
-                if exists:
-                    print(f"Found correct path: {normalized_path}")
-                    path = normalized_path
-                    break
-            else:
-                print("Could not find the project directory")
-                continue
+            print("Could not find the project directory")
 
         # Get application version from appsettings
         app_setting_path = os.path.join(path, "appsettings.json")
-        if env.lower() in ["staging", "dev"]:
+        if env.lower() in ["staging", "dev", "uat"]:
             env_setting_path = os.path.join(path, f"appsettings.{env.title()}.json")
             if os.path.exists(env_setting_path):
                 app_setting_path = env_setting_path
@@ -515,7 +497,7 @@ def main():
             continue
         
         # Update YAML files with the new image tag (only in CICD mode)
-        if not update_yaml_files(env, yaml_files, image_tag, version, yamlpath):
+        if not update_yaml_files(repo, env, yaml_files, image_tag, version, yamlpath):
             print(f"Failed to update YAML files for {image_tag}")
             build_results.append(False)
             continue
@@ -533,7 +515,7 @@ def main():
         
         # Commit changes (only in CICD mode)
         print("Committing changes to Git...")
-        if not commit_changes(env, original_config):
+        if not commit_changes(repo, env, original_config):
             print("Failed to commit changes")
             build_results.append(False)
             continue

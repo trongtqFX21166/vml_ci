@@ -1,0 +1,22 @@
+[
+  {
+    "hub": "vmapi/vml-s2",
+    "app": "vietmaplive.trafficreport.admin.api",
+    "path": "../traffic-report/VietmapLive.TrafficReport/VietmapLive.TrafficReport.Admin.Api",
+    "yamlpath": "traffic-report-admin-api",
+    "yaml": "traffic-report-admin-api-deployment.yaml",
+    "index": 0,
+    "version": "dev.1.0.11",
+    "readytodeploy": 1
+  },
+  {
+    "hub": "vmapi/vml-s2",
+    "app": "vietmaplive.trafficreport.admin.api",
+    "path": "../traffic-report/VietmapLive.TrafficReport/VietmapLive.TrafficReport.Admin.Api",
+    "yamlpath": "traffic-report-admin-api",
+    "yaml": "traffic-report-admin-api-deployment.yaml",
+    "index": 0,
+    "version": "dev.1.0.11",
+    "readytodeploy": 1
+  }
+]
